@@ -1,0 +1,4 @@
+%YAML:1.0
+---
+sample_path: ../sample/6_253.jpg
+onnx_path: ../model/2023_2_1_hj_num_2.onnx
