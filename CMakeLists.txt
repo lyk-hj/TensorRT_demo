@@ -14,11 +14,10 @@ set(TRT_COMMON_WINDWOS_DIRS ${TRT_DIR}/samples/common/windows)
 set(CMAKE_CXX_STANDARD 11)
 
 
-set(CUDA_DIR "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.2/")
-set(CUDA_LIB_DIRS ${CUDA_DIR}/lib/x64)
+set(CUDA_DIR "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.6/lib/x64")
+set(CUDA_LIB_DIRS "${CUDA_DIR}/lib/x64/")
 set(CUDA_TOOLKIT_ROOT_DIR ${CUDA_DIR})
 set(CMAKE_CUDA_COMPILER ${CUDA_DIR}/bin/nvcc.exe)
-
 set(OpenCV_DIR "E:/opencv-4.5.4/opencv/build/x64/vc16")
 #if(WIN32)
 #enable_language(CUDA)

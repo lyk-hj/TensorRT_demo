@@ -62,17 +62,25 @@ public:
 
     float* processInput(cv::Mat src);//!< Reads the input and stores the result in a managed buffer to feed in neural network
 
-    int inputH;
-    int inputW;
-    int outputSize;
+//    int inputH;
+//    int inputW;
+//    int outputSize;
 private:
     Logger gLogger;
 
     std::string onnx_path;
 
+    const char *INPUT_BLOB_NAME = "input";
+    const char *OUTPUT_BLOB_NAME = "output";
+    const int inputH = 24;
+    const int inputW = 24;
+    const int inputC = 1;
+    std::vector<std::string> classes = {"0", "1", "2", "3", "4", "5", "6", "7", "8"};
+    const int outputSize = classes.size();
+
     const int batchSize = 1;
-    const char* INPUT_BLOB_NAME = "input";
-    const char* OUTPUT_BLOB_NAME = "output";
+//    const char* INPUT_BLOB_NAME = "input";
+//    const char* OUTPUT_BLOB_NAME = "output";
 
     nvinfer1::Dims InuputDims;//!< The dimensions of the input to the network
     nvinfer1::Dims OutputDims;//!< The dimensions of the output to the network

@@ -180,13 +180,6 @@ bool NumberDetection::synLoadInfer()
 {
     try{
         //!< preset parameters
-        const char *INPUT_BLOB_NAME = "input";
-        const char *OUTPUT_BLOB_NAME = "output";
-        const int inputH = 30;
-        const int inputW = 20;
-        const int inputC = 1;
-        const int outputSize = 6;
-        std::string classes[]{"0", "1", "2", "3", "4", "6"};
         //        cv::FileStorage fs("../other/trt_params.yaml", cv::FileStorage::READ);
         std::vector<std::string> sample_paths = {"../sample/2.png",
                                                  "../sample/3.png",
@@ -196,7 +189,7 @@ bool NumberDetection::synLoadInfer()
         //        fs.release();
 
         //!< load model and create context
-        std::ifstream file("../model/2023_2_1_hj_num_2.trt", std::ios::binary);
+        std::ifstream file("../model/2023_3_16_hj_num_1.trt", std::ios::binary);
         file.seekg(0, file.end);
         size_t size = file.tellg();
         file.seekg(0, file.beg);
@@ -238,7 +231,6 @@ bool NumberDetection::synLoadInfer()
                     (float*)buffers[inputIndex]+inputC*inputH*inputW*i, input.get(), inputC * inputH * inputW * sizeof(float),
                     cudaMemcpyHostToDevice
                     ));
-            //            buffInputIdx+=inputC*inputH*inputW;
         }
 
         if(context->getEngine().hasImplicitBatchDimension())printf("context has implicit\n");
@@ -248,16 +240,21 @@ bool NumberDetection::synLoadInfer()
         auto start = std::chrono::high_resolution_clock::now();
         float* output = new float[outputSize*batchSize];
         const int& outputIndex = engine->getBindingIndex(OUTPUT_BLOB_NAME);
-        //        std::cout<<inputIndex<<std::endl;
+//        std::cout<<inputIndex<<std::endl;
         CHECK(cudaMalloc(&buffers[outputIndex], batchSize * outputSize * sizeof(float)));
-        context->setInputShape(INPUT_BLOB_NAME,Dims4(batchSize,1,30,20));
-        std::cout<<context->getBindingDimensions(0).d[2]<<std::endl;
+        context->setInputShape(INPUT_BLOB_NAME,Dims4(batchSize,inputC,inputH,inputW));
+
+
+        // if want dynamic input, trtexec should set the min, opt, and max shapes.
+        std::cout<<context->getBindingDimensions(0).d[0]<<std::endl;
         context->executeV2(buffers.data());
         CHECK(cudaMemcpy(
                 output, buffers[outputIndex], batchSize * outputSize * sizeof(float), cudaMemcpyDeviceToHost
                 ));
         //        cudaStreamSynchronize(*stream);
 
+        auto end = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration<double>(end-start).count();
         //Release buffers
         CHECK(cudaFree(buffers[inputIndex]));
         CHECK(cudaFree(buffers[outputIndex]));
@@ -275,8 +272,6 @@ bool NumberDetection::synLoadInfer()
         delete runtime;
         output = nullptr;
         delete output;
-        auto end = std::chrono::high_resolution_clock::now();
-        auto duration = std::chrono::duration<double>(end-start).count();
         printf("Inference duration: %lf\n", duration);
         return true;
     }catch (const std::exception &ex)
